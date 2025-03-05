@@ -1,12 +1,17 @@
 # ray-ponder.py
-from RayPonder import player, record
+import configparser
+from configobj import ConfigObj
+from RayPonder.EventLoop import EventLoop
+import threading
 
 def main():
-    # Jouer un fichier audio
-    player.play_message()
 
-    # Démarrer l'enregistrement
-    record.record_audio()
+    config = configparser.ConfigParser()
+    config.read('ray-ponder.conf')
+    event_loop = EventLoop(config)
+    event_loop.start()
+    event_loop.run()
 
 if __name__ == "__main__":
     main()
+    # threading.main_thread().join()
