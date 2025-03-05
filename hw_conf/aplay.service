@@ -1,0 +1,11 @@
+# avoid sound cracking src:https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/main/i2samp.py
+# infos micros: https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/raspberry-pi-wiring-test
+# infos ampli max98357 : https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/raspberry-pi-usage
+[Unit]
+Description=Invoke aplay from /dev/zero at system start.
+
+[Service]
+ExecStart=/usr/bin/aplay -D default -t raw -r 48000 -c 2 -f S32_LE /dev/zero
+
+[Install]
+WantedBy=multi-user.target

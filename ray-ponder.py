@@ -1,6 +1,6 @@
 # ray-ponder.py
 import configparser
-from configobj import ConfigObj
+#from configobj import ConfigObj
 from RayPonder.EventLoop import EventLoop
 import threading
 
