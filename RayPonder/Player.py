@@ -3,7 +3,7 @@ import threading
 import pyaudio
 import wave
 import time
-
+import os
 import threading
 from RayPonder import Events
 
@@ -13,9 +13,10 @@ from RayPonder import Events
 class Player():
     def __init__(self, config, queue):
         self.evt_qu = queue
-        self.config = config
+        self.config = config['player']
         # TODO mettre filename dans fichier de config
-        self.filename = './messages/Cabine6.wav'
+        self.filename = os.path.join( config['general']['root'] , self.config['message-path'] , self.config['start-message'])
+        # print(f"Player() : Filename -> {self.filename}") 
         self.p = pyaudio.PyAudio()
         self.playing = False
         self.stopped = True
@@ -64,7 +65,7 @@ class Player():
             # print(f"remaining {wf.tell()}")
         if(wf.tell() == wf.getnframes()):
             #need to send a message to say we can record....
-            print("PLAYER() : sending EndOfMessage")
+            # print("PLAYER() : sending EndOfMessage")
             evt = Events.RayEvent(producer=self, ray_event=Events.RayEventType.MessagePlayFinished)
             self.evt_qu.put(evt)
         self.stream.stop_stream()
@@ -76,20 +77,20 @@ class Player():
     def play(self):
         self.playing = True
         self.stopped = False
-        print(f"PLAYER() : playing {self.playing}, stopped {self.stopped}")
+        # print(f"PLAYER() : playing {self.playing}, stopped {self.stopped}")
         # print(f"not self.running {not self.running}")
         
 
     def stop(self):
         self.playing = False
         self.stopped = True
-        print(f"PLAYER() : playing {self.playing}, stopped {self.stopped}")
+        # print(f"PLAYER() : playing {self.playing}, stopped {self.stopped}")
         
 
     def clean_up(self):
         self.running = False
         self.stop = self.playing = False
-        print(f"PLAYER() :playing : {self.playing}, stopped : {self.stopped}")
+        # print(f"PLAYER() :playing : {self.playing}, stopped : {self.stopped}")
         self.p.terminate()
         self.stream.close()
         print("PLAYER() : Player closed gracefully")

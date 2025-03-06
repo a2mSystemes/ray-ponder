@@ -6,6 +6,7 @@ from datetime import datetime
 import threading
 import time
 from RayPonder import Events
+import uuid
 
 class Recorder:
     def __init__(self, config = None, queue = None):
@@ -14,18 +15,24 @@ class Recorder:
         self.recording = False
         self.running = False
         self.p = pyaudio.PyAudio()
-        self.dest_dir = os.path.join(os.getcwd(), self.config['dest-dir'])
-        self.file_name_format = self.config['strftime-template'] + self.config['file-prepend'] + self.config['file-ext']
-        print(f"RECORDER() : dest dir {self.dest_dir}")
-        print(f"RECORDER() : file name format {self.file_name_format}")
-        print(f"RECORDER() : filename example {self.format_name()}")
+        self.generate_uuid = self.config.getboolean('add-uuid')
+        self.dest_dir = os.path.join(config['general']['root'], self.config['dest-dir'])
+        self.file_name_format = self.config['strftime-template'] + self.config['file-prepend'] 
+        # print(f"RECORDER() : dest dir {self.dest_dir}")
+        # print(f"RECORDER() : file name format {self.file_name_format}")
+        # print(f"RECORDER() : filename example {self.format_name()}")
         self.chunk_size = 1024
         self.framerate = int(self.config['framerate'])
         self.max_duration = int(self.config['recode-timeout']) * 60 # in seconds
         self.channels = int(self.config['channels'])
 
     def format_name(self):
-        return datetime.now().strftime(self.file_name_format)
+        filename = datetime.now().strftime(self.file_name_format)
+        if self.generate_uuid:
+            f_id = uuid.uuid4().hex
+            filename = filename + "_" + f_id[0:6] 
+            # print(f"uuid {f_id} \n{filename}")
+        return filename + self.config['file-ext']
 
     def start(self):
         self.running = True
@@ -61,10 +68,10 @@ class Recorder:
             data = stream.read(self.chunk_size)
             buff.append(data)
             duration -= 1
-            print(f"RECORDER() : remaining {self.get_remaining(duration)}") 
+            # print(f"RECORDER() : remaining {self.get_remaining(duration)}") 
             if(not self.recording):
                 timeout = False
-                print("RECORDER() : stop recording")
+                # print("RECORDER() : stop recording")
                 break
             if(duration == 0):
                 self.recording = False
@@ -76,7 +83,6 @@ class Recorder:
             self.queue.put(evt_timeout)
         stream.stop_stream()
         stream.close()
-
         wf = wave.open(filename, 'wb')
         wf.setnchannels(2)
         wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt32))
@@ -86,26 +92,28 @@ class Recorder:
         
         
     def get_remaining(self, duration):
-        print(f"RECODER() : duration in chunks {duration}")
-        return int( duration / self.chunk_size )
+        pass
     
     def stop_recording(self):
         self.recording = False
         
     def record(self):
-        print("RECORDER() : Start Recording")
+        # print("RECORDER() : Start Recording")
         self.recording = True
+
         
-    def shutdown(self):
+    def clean_up(self):
         if(self.recording):
             self.stop_recording()
         self.running = False
-        self.clean_up()
-        
-    def clean_up(self):
-        #free pyaudio
         self.p.terminate()
+        print("RECORDER() : Player closed gracefully")
+                
+    def shutdown(self):
+        self.clean_up()
         self.thread.join()
+        
+
 
 if __name__ == "__main__":
     recorder = Recorder()

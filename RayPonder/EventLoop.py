@@ -42,18 +42,18 @@ class EventLoop:
                 try:
                     event = self.event_queue.get(timeout=0.5)
                     if (event.ray_event == Events.RayEventType.PickUp):
-                        print("EventLoop() : phone was pickup")
+                        # print("EventLoop() : phone was pickup")
                         self.trigger_main_sequence()
                         # print("playing OK")
                     elif (event.ray_event == Events.RayEventType.HangUp):
-                        print("EventLoop() : phone was Hang Up")
+                        # print("EventLoop() : phone was Hang Up")
                         self.stop_main_sequence()
                         self.stop_record()
                     elif(event.ray_event == Events.RayEventType.MessagePlayFinished):
-                        print("EventLoop() : Audio message read. Ready to record")
+                        # print("EventLoop() : Audio message read. Ready to record")
                         self.record()
                     elif(event.ray_event == Events.RayEventType.RecorderTimeout):
-                        print("EventLoop() : Recorder timeout")
+                        # print("EventLoop() : Recorder timeout")
                         pass
 
                         # trigger main sequence
