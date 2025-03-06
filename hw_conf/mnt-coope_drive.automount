@@ -1,0 +1,15 @@
+# copy to /etc/systemd/system/mnt-coope_drive.automount
+# name of the service file MUST be path-to-mount-point for /path/to/mount/point
+# .mount and .automount mandatory file ext for automount services
+# sudo blkid -o list >> find the dsik UUID in .mount
+# sudo systemctl daemon-reload
+# sudo systemctl enable mnt-coope_drive.mount mnt-coope_drive.automount
+# sudo reboot
+[Unit]
+Description=Automount coope_drive
+
+[Automount]
+Where=/mnt/coope_drive
+
+[Install]
+WantedBy=multi-user.target

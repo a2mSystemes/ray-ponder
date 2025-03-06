@@ -1,0 +1,14 @@
+[Unit]
+Description=Ray-Ponder Service
+After=network.target multi-user.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=coope
+WorkingDirectory=/home/coope/ray-ponder/
+ExecStart=/home/coope/ray-ponder/.venv/bin/python /home/coope/ray-ponder/ray-ponder.py
+
+[Install]
+WantedBy=multi-user.target
